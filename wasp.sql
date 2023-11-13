@@ -21,6 +21,10 @@ CREATE TABLE member (
     startDate DATE NOT NULL
 );
 
+CREATE TABLE opponent (
+    id INT PRIMARY KEY
+);
+
 CREATE TABLE enemy (
     id INT PRIMARY KEY,
     reason VARCHAR NOT NULL,
@@ -146,10 +150,6 @@ CREATE TABLE grant_ (
     reviewerId INT REFERENCES member(id),
     reviewDate DATE,
     reviewGrade SMALLINT
-);
-
-CREATE TABLE opponent (
-    id INT PRIMARY KEY
 );
 
 -- 0..* member opposes 0..* opponent
