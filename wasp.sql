@@ -45,7 +45,7 @@ CREATE TABLE person (
 -- 1 member has 0..* asset
 CREATE TABLE asset (
     name VARCHAR PRIMARY KEY,
-    memberId INT REFERENCES person(id) NOT NULL,
+    ownerId INT REFERENCES person(id) NOT NULL,
     detail VARCHAR NOT NULL,
     uses VARCHAR NOT NULL
 );
@@ -53,7 +53,7 @@ CREATE TABLE asset (
 CREATE TABLE linking (
     id INT PRIMARY KEY,
     name VARCHAR NOT NULL,
-    type VARCHAR NOT NULL,
+    type_ VARCHAR NOT NULL,
     description VARCHAR NOT NULL
 );
 
@@ -63,12 +63,12 @@ CREATE TABLE participate (
     linkingId INT REFERENCES linking(id) NOT NULL,
     PRIMARY KEY (personId, linkingId),
 
-    memberId INT REFERENCES member(id) NOT NULL -- 1 member monitors 0..* participation
+    monitorId INT REFERENCES member(id) NOT NULL -- 1 member monitors 0..* participation
 );
 
 CREATE TABLE role (
     id INT PRIMARY KEY,
-    title VARCHAR NOT NULL,
+    title VARCHAR UNIQUE NOT NULL,
     salary INT NOT NULL
 );
 
@@ -77,20 +77,22 @@ CREATE TABLE serve (
     memberId INT REFERENCES member(id) NOT NULL,
     roleId INT REFERENCES role(id) NOT NULL,
     startDate DATE NOT NULL,
-    endDate DATE NOT NULL
+    endDate DATE NOT NULL,
 
-    PRIMARY KEY (memberId, roleId),
+    PRIMARY KEY (memberId, roleId)
 );
 
 CREATE TABLE party (
     id INT PRIMARY KEY,
     country VARCHAR NOT NULL,
     name VARCHAR NOT NULL,
+    UNIQUE (country, name), -- Country + name must be unique
 
     -- Monitors relation
     memberId INT REFERENCES member(id) NOT NULL, -- 1 member monitors 0..* party
     startDate DATE NOT NULL,
     endDate DATE NOT NULL,
+    log_ VARCHAR NOT NULL,
 
     -- Categorization of opponent
     opponentId INT REFERENCES opponent(id) NOT NULL
@@ -98,7 +100,7 @@ CREATE TABLE party (
 
 CREATE TABLE ally (
     alias VARCHAR PRIMARY KEY,
-    trustLevel SMALLINT NOT NULL
+    trust SMALLINT NOT NULL
 );
 
 -- 1 ally has 0..* value
