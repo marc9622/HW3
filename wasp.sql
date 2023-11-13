@@ -13,6 +13,8 @@ DROP TABLE IF EXISTS affiliates CASCADE;
 DROP TABLE IF EXISTS supports CASCADE;
 DROP TABLE IF EXISTS sponsor CASCADE;
 DROP TABLE IF EXISTS grant_ CASCADE;
+DROP TABLE IF EXISTS opponent CASCADE;
+DROP TABLE IF EXISTS oppose CASCADE;
 
 CREATE TABLE member (
     id INT PRIMARY KEY,
@@ -21,7 +23,10 @@ CREATE TABLE member (
 
 CREATE TABLE enemy (
     id INT PRIMARY KEY,
-    reason VARCHAR NOT NULL
+    reason VARCHAR NOT NULL,
+
+    -- Categorization of opponent
+    opponentId INT REFERENCES opponent(id) NOT NULL
 );
 
 CREATE TABLE person (
@@ -37,9 +42,10 @@ CREATE TABLE person (
     enemyId INT REFERENCES enemy(id) -- NULL means not an enemy
 );
 
+-- 1 member has 0..* asset
 CREATE TABLE asset (
     name VARCHAR PRIMARY KEY,
-    memberId INT REFERENCES person(id) NOT NULL, -- 1 member has 0..* asset
+    memberId INT REFERENCES person(id) NOT NULL,
     detail VARCHAR NOT NULL,
     uses VARCHAR NOT NULL
 );
@@ -70,10 +76,10 @@ CREATE TABLE role (
 CREATE TABLE serve (
     memberId INT REFERENCES member(id) NOT NULL,
     roleId INT REFERENCES role(id) NOT NULL,
-    PRIMARY KEY (memberId, roleId),
-
     startDate DATE NOT NULL,
     endDate DATE NOT NULL
+
+    PRIMARY KEY (memberId, roleId),
 );
 
 CREATE TABLE party (
@@ -84,7 +90,10 @@ CREATE TABLE party (
     -- Monitors relation
     memberId INT REFERENCES member(id) NOT NULL, -- 1 member monitors 0..* party
     startDate DATE NOT NULL,
-    endDate DATE NOT NULL
+    endDate DATE NOT NULL,
+
+    -- Categorization of opponent
+    opponentId INT REFERENCES opponent(id) NOT NULL
 );
 
 CREATE TABLE ally (
@@ -102,6 +111,7 @@ CREATE TABLE value (
 CREATE TABLE affiliates (
     memberId INT REFERENCES member(id) NOT NULL,
     allyAlias VARCHAR REFERENCES ally(alias) NOT NULL,
+
     PRIMARY KEY (memberId, allyAlias)
 );
 
@@ -109,6 +119,7 @@ CREATE TABLE affiliates (
 CREATE TABLE supports (
     allyAlias VARCHAR REFERENCES ally(alias) NOT NULL,
     partyId INT REFERENCES party(id) NOT NULL,
+    
     PRIMARY KEY (allyAlias, partyId)
 );
 
@@ -123,10 +134,29 @@ CREATE TABLE sponsor (
 CREATE TABLE grant_ (
     sponsorId INT REFERENCES sponsor(id) NOT NULL,
     memberId INT REFERENCES member(id) NOT NULL,
-    PRIMARY KEY (sponsorId, memberId),
-
     date_ DATE NOT NULL,
     amount INT NOT NULL,
-    payback VARCHAR NOT NULL
+    payback VARCHAR NOT NULL,
+
+    PRIMARY KEY (sponsorId, memberId, date_),
+
+    -- 0..1 member review 0..* grant
+    reviewerId INT REFERENCES member(id),
+    reviewDate DATE,
+    reviewGrade SMALLINT
+);
+
+CREATE TABLE opponent (
+    id INT PRIMARY KEY
+);
+
+-- 0..* member opposes 0..* opponent
+CREATE TABLE oppose (
+    memberId INT REFERENCES member(id) NOT NULL,
+    opponentId INT REFERENCES opponent(id) NOT NULL,
+    startDate DATE NOT NULL,
+    endDate DATE,
+
+    PRIMARY KEY (memberId, opponentId)
 );
 
