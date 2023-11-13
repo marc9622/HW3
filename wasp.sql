@@ -12,7 +12,7 @@ DROP TABLE IF EXISTS value CASCADE;
 DROP TABLE IF EXISTS affiliates CASCADE;
 DROP TABLE IF EXISTS supports CASCADE;
 DROP TABLE IF EXISTS sponsor CASCADE;
-DROP TABLE IF EXISTS grantMoney CASCADE;
+DROP TABLE IF EXISTS grant_ CASCADE;
 
 CREATE TABLE member (
     id INT PRIMARY KEY,
@@ -120,12 +120,12 @@ CREATE TABLE sponsor (
 );
 
 -- 0..* sponsor grants 0..* member
-CREATE TABLE grantMoney (
+CREATE TABLE grant_ (
     sponsorId INT REFERENCES sponsor(id) NOT NULL,
     memberId INT REFERENCES member(id) NOT NULL,
     PRIMARY KEY (sponsorId, memberId),
 
-    grantDate DATE NOT NULL,
+    date_ DATE NOT NULL,
     amount INT NOT NULL,
     payback VARCHAR NOT NULL
 );
